@@ -4,6 +4,8 @@
   <artifactId>RESTfulWS</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>war</packaging>
+  <name>RESTfulWS Maven Webapp</name>
+  <url>https://github.com/JessMtzG/RESTfulWS</url>
   
   <properties>
 	<org.springframework-version>4.2.5.RELEASE</org.springframework-version>
@@ -226,4 +228,19 @@
 		</dependencies>
 	</dependencyManagement>
 	
+	<build>
+    <finalName>RESTfulWS</finalName>
+     <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+    	<testSourceDirectory>${project.basedir}/src/test/java</testSourceDirectory>
+    	<resources>
+     	 <resource>
+        	<directory>${project.basedir}/src/main/resources</directory>
+      	 </resource>
+    	</resources>
+    	<testResources>
+      		<testResource>
+        		<directory>${project.basedir}/src/test/resources</directory>
+      		</testResource>
+    	</testResources>
+    </build>
 </project>
