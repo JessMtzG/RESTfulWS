@@ -1,7 +1,6 @@
 package me.jmll.utm.service;
 
 import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,17 +9,22 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
+import me.jmll.utm.model.Notification;
+import me.jmll.utm.repository.NotificationRepository;
 
 @Service
 public class NotificationServiceImpl implements NotificationService {
 	@Autowired
 	private MailSender mailSender;
-	
+	@Autowired
+	NotificationRepository notificationRepository;
 	private static final Logger logger = LogManager.getLogger();
-	
-	/**
-	 * Define notify como método asíncrono
-	 * */
+
+	@Override
+	public List<Notification> getNotifications() {
+		return notificationRepository.getNotifications();
+	}
+
 	@Async
 	@Override
 	public void notify(String subject, String message, List<String> toAddress, List<String> ccAddress) {
@@ -29,14 +33,6 @@ public class NotificationServiceImpl implements NotificationService {
 		String threadName = Thread.currentThread().getName();
 		logger.info("{} started subject={}, message={}, toAddress={}, ccAddress={}", threadName,
 				subject, message, toAddress, ccAddress);
-		/**
-		 * Crea un objeto de tipo SimpleMailMessage
-		 * configurando To con setTo y el valor de (String.join(",", toAddress)
-		 * CC con el método setCc y el valor de String.join(",", ccAddress)
-		 * Subject con el método setSubject y el valor de subject
-		 * y el texto con setText y el valor de message
-		 * Finalmente envía el correo con el método send de mailSender
-		 * */
 		try {
 			SimpleMailMessage emailMessage = new SimpleMailMessage();
 			emailMessage.setTo(String.join(",", toAddress));

@@ -31,14 +31,14 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * Establece el escaneo de componentes del paquete me.jmll.utm.web con filtro de
- * exclusi贸n org.springframework.stereotype.Controller, es
- * decir @Repository, @Service, @Component, etc. Centra la l贸gica de negocio en
- * el contexto de la aplicaci贸n.
+ * exclusi髇 org.springframework.stereotype.Controller, es
+ * decir @Repository, @Service, @Component, etc. Centra la l骻ica de negocio en
+ * el contexto de la aplicaci髇.
  */
 @Configuration
 /**
  * Configura RootContextConfig para que soporte
- * ejecuci贸n de m茅todos as铆ncronos y programados.
+ * ejecuci髇 de m閠odos as韓cronos y programados.
  * */
 @EnableAsync
 @EnableScheduling
@@ -56,7 +56,7 @@ public class RootContextConfig implements AsyncConfigurer, SchedulingConfigurer 
 	private static final Logger schedulingLogger = LogManager.getLogger(String.format("%s-schedue", logger.getName()));
 	
 	/**
-	 * Busca y registra los m贸dulos para serializaci贸n y deserializaci贸n
+	 * Busca y registra los m骴ulos para serializaci髇 y deserializaci髇
 	 */
 	@Bean
 	public ObjectMapper objectMapper() {
@@ -78,7 +78,7 @@ public class RootContextConfig implements AsyncConfigurer, SchedulingConfigurer 
 	}
 
 	/**
-	 * Configura Executor para ejecuci贸n de m茅todos programados
+	 * Configura Executor para ejecuci髇 de m閠odos programados
 	 * */
 	@Override
 	public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
@@ -87,7 +87,7 @@ public class RootContextConfig implements AsyncConfigurer, SchedulingConfigurer 
 	}
 	
 	/**
-	 * Configura Executor para ejecuci贸n de m茅todos as铆ncronos
+	 * Configura Executor para ejecuci髇 de m閠odos as韓cronos
 	 * */
 	@Override
 	public Executor getAsyncExecutor() {
@@ -98,13 +98,13 @@ public class RootContextConfig implements AsyncConfigurer, SchedulingConfigurer 
 	/**
 	 * Configura taskScheduler con un pool de 10 elementos,
 	 * prefijo "worker-", tiempo de espera de apagado de 60 seg
-	 * y espera de terminaci贸n de tarea antes de completar. 
+	 * y espera de terminaci髇 de tarea antes de completar. 
 	 * Configura handlers para errores.
 	 * */
 	@Bean
 	public ThreadPoolTaskScheduler taskScheduler() {
 		/**
-		 * Configura ThreadPoolTaskScheduler con un tama帽o de pool
+		 * Configura ThreadPoolTaskScheduler con un tama駉 de pool
 		 * de 20, con prefijo en los threads "job-", errorHandler y
 		 * ExecutionHandler para que registren eventos en shcedulingLogger 
 		 * */
@@ -142,13 +142,13 @@ public class RootContextConfig implements AsyncConfigurer, SchedulingConfigurer 
 		 *  Utiliza Gmail como servidor de correo para enviar
 		 *  email en el servicio NotificationServiceImpl que consume 
 		 *  el bean mailSender. Agregar usuario y password de una cuenta
-		 *  gen茅rica
+		 *  gen閞ica
 		 * */
 	    JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 	    mailSender.setHost("smtp.gmail.com");
 	    mailSender.setPort(587);
-	    mailSender.setUsername("me@jose-manuel.me");
-	    mailSender.setPassword("hhthlspdqidujhrj");
+	    mailSender.setUsername("jessamg17@gmail.com");
+	    mailSender.setPassword("jamg2018");
 	    Properties mailProperties = mailSender.getJavaMailProperties();
 	    mailProperties.put("mail.transport.protocol", "smtp");
 	    mailProperties.put("mail.smtp.auth", "true");

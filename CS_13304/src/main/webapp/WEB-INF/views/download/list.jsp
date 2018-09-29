@@ -1,3 +1,5 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %> 
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <b:base title="List Complete">
     <div class="container">
 
@@ -54,12 +56,12 @@
 					<div class="alert alert-info" role="alert">${warning }</div>
 				</c:forEach>
 		</c:if>
+		
 		<c:if test="${not empty errors }">
 				<c:forEach var="error" items="${errors }">
 					<div class="alert alert-danger" role="alert">${error }</div>
 				</c:forEach>
 		</c:if>
 	</div>
-
     </div> <!-- /container -->
  </b:base>

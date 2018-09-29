@@ -17,8 +17,7 @@ import org.springframework.http.converter.xml.SourceHttpMessageConverter;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.multipart.MultipartResolver;
-import org.springframework.web.multipart.support.StandardServletMultipartResolver;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.RequestToViewNameTranslator;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
@@ -39,9 +38,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @EnableWebMvc
 @ComponentScan(
 		basePackageClasses = {
-				me.jmll.utm.web.ComponentPackageMaker.class }, 
+				me.jmll.utm.web.ComponentPackageMaker.class },
 		useDefaultFilters = false,
-		includeFilters = @ComponentScan.Filter(Controller.class) )
+		includeFilters = @ComponentScan.Filter(Controller.class))
 public class ServletContextConfig extends WebMvcConfigurerAdapter {
 	@Inject
 	ObjectMapper objectMapper;
@@ -50,21 +49,11 @@ public class ServletContextConfig extends WebMvcConfigurerAdapter {
 	@Inject
 	Unmarshaller unmarshaller;
 
-	/**
-	 * Maneja las solicitudes HTTP GET para /resources/** al servir
-	 * eficientemente recursos estáticos en el directorio
-	 * ${webappRoot}/resources
-	 */
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");
 		super.addResourceHandlers(registry);
 	}
-
-	/**
-	 * Resuelve vistas seleccionadas al interpretar .jsp por @Controllers en el
-	 * directorio /WEB-INF/views
-	 */
 	@Bean
 	public ViewResolver getViewResolver() {
 		InternalResourceViewResolver resolver = new InternalResourceViewResolver();
@@ -73,67 +62,40 @@ public class ServletContextConfig extends WebMvcConfigurerAdapter {
 		resolver.setSuffix(".jsp");
 		return resolver;
 	}
-
-	/**
-	 * Configura RequestToViewNameTranslator con
-	 * DefaultRequestToViewNameTranslator
-	 */
 	@Bean
 	public RequestToViewNameTranslator viewNameTranslator() {
 		return new DefaultRequestToViewNameTranslator();
 	}
-
-	/**
-	 * Configura MultipartResolver con StandardServletMultipartResolver
-	 */
 	@Bean
-	public MultipartResolver multipartResolver() {
-		return new StandardServletMultipartResolver();
+	public CommonsMultipartResolver multipartResolver(){
+	    CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
+	    multipartResolver.setDefaultEncoding("UTF-8");
+	    multipartResolver.setMaxUploadSize(-1);
+	    return multipartResolver;
 	}
-
-	/**
-	 * Configura messageConverters
-	 */
+	
 	@Override
 	public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-		// XML converter
 		converters.add(createXMLMessageConverter());
-		// JSON converter
 		converters.add(createJSONMessageConverter());
-
-		// Converters de Spring generalmente configurados automáticamente
 		converters.add(new FormHttpMessageConverter());
 		converters.add(new SourceHttpMessageConverter<>());
 		converters.add(new ByteArrayHttpMessageConverter());
 		converters.add(new StringHttpMessageConverter());
 	}
-
-	/**
-	 * Crea XML Message Converter
-	 */
 	private MarshallingHttpMessageConverter createXMLMessageConverter() {
 		MarshallingHttpMessageConverter xmlConverter = new MarshallingHttpMessageConverter();
-		xmlConverter.setSupportedMediaTypes(
-				Arrays.asList(new MediaType("application", "xml"), new MediaType("text", "xml")));
+		xmlConverter.setSupportedMediaTypes(Arrays.asList(new MediaType("application", "xml"), new MediaType("text", "xml")));
 		xmlConverter.setMarshaller(this.marshaller);
 		xmlConverter.setUnmarshaller(this.unmarshaller);
 		return xmlConverter;
 	}
-
-	/**
-	 * Crea JSON Message Converter
-	 */
 	private MappingJackson2HttpMessageConverter createJSONMessageConverter() {
 		MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
-		jsonConverter.setSupportedMediaTypes(
-				Arrays.asList(new MediaType("application", "json"), new MediaType("text", "json")));
+		jsonConverter.setSupportedMediaTypes(Arrays.asList(new MediaType("application", "json"), new MediaType("text", "json")));
 		jsonConverter.setObjectMapper(this.objectMapper);
 		return jsonConverter;
 	}
-
-	/**
-	 * Configura la negociación de contenido
-	 */
 	@Override
 	public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
 		configurer.favorPathExtension(true).favorParameter(false);

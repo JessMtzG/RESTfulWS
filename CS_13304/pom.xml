@@ -4,7 +4,7 @@
   <artifactId>EvidenciaFinal</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>war</packaging>
-  <name>RESTfulWS Maven Webapp</name>
+  <name>RESTfulWS</name>
   <url>https://github.com/JessMtzG/RESTfulWS</url>
 <properties>
 	<org.springframework-version>4.2.5.RELEASE</org.springframework-version>

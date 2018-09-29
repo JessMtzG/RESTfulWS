@@ -11,5 +11,3 @@ public interface UserRepository {
 	public void deleteUser(String username);
 	public User updateUser(User user);
 }
-
-

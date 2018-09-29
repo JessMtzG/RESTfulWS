@@ -13,14 +13,14 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
+import me.jmll.utm.form.NotificationForm;
 import me.jmll.utm.model.Link;
-import me.jmll.utm.model.Notification;
 import me.jmll.utm.model.NotificationLinkListResource;
 import me.jmll.utm.model.OptionsDoc;
 import me.jmll.utm.service.NotificationService;
@@ -28,69 +28,74 @@ import me.jmll.utm.service.NotificationService;
 
 @Controller
 public class NotificationRest {
-	static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
+
 	@Autowired
 	NotificationService notificationService;
-	@RequestMapping(value = "/api/v1/notify",
-			method = RequestMethod.OPTIONS)
-	@ResponseBody
-	public ResponseEntity<?> showOptions(){
-		OptionsDoc options = new OptionsDoc();
-		options.addOption(HttpMethod.GET, "Lists notifications submitted");
-		options.addOption(HttpMethod.OPTIONS, "Resource documentation");
-		options.addOption(HttpMethod.POST, "submits notification to send");
+
+	@RequestMapping(value = "notify", method = RequestMethod.OPTIONS)
+	public ResponseEntity<?> showOptions() {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Allow", "OPTIONS,GET,POST");
-		return new ResponseEntity<>(headers, HttpStatus.ACCEPTED);
+		
+		Map<HttpMethod, String> methods = new Hashtable<>(3);
+		methods.put(HttpMethod.GET, "Lists notifications submitted.");
+		methods.put(HttpMethod.OPTIONS, "Resource documentation.");
+		methods.put(HttpMethod.POST, "Submits notification to send.");
+		
+		OptionsDoc options = new OptionsDoc();
+		options.setMethods(methods);
+		
+		return new ResponseEntity<>(options, headers, HttpStatus.OK);
 	}
-	
-	@RequestMapping(value = "/api/v1/notify",
+
+	@RequestMapping(value = "notify",
 			method = RequestMethod.GET,
-			produces = { "application/json", "text/json"})
+			produces = { "application/json", "text/json" })
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	public Map<String, Object> getNotificationsJSON(){
-		List<Notification> notifications = new ArrayList<Notification>();
-		notifications = notificationService.getNotifications();
-		List<Link> _links = new ArrayList<Link>();
-		_links.add(new Link(ServletUriComponentsBuilder.fromCurrentServletMapping().path("/")
-		 .build().toString(), "api"));
-		_links.add(new Link(ServletUriComponentsBuilder.fromCurrentServletMapping().path("/notify/")
-		 .build().toString(), "self"));
+	public Map<String, Object> getNotificationsJSON() {
+		ServletUriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentServletMapping();		
+		
+		List<Link> links = new ArrayList<Link>();
+		links.add(new Link(builder.path("/").build().toString(), "api"));
+		links.add(new Link(builder.path("/notify/").build().toString(), "self"));
+		
 		Map<String, Object> response = new Hashtable<>(2);
-		response.put("_links", _links);
-		response.put("data", notifications);
+		response.put("_links", links);
+		response.put("data", notificationService.getNotifications());
 		return response;
 	}
 	
-	
-	@RequestMapping(value = "/api/v1/notify", 
-			method = RequestMethod.GET, 
+	@RequestMapping(value = "notify", 
+			method = RequestMethod.GET,
 			produces = { "application/xml", "text/xml" })
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	public NotificationLinkListResource getNotificationsXML(){
-		List<Notification> notifications = new ArrayList<Notification>();
-		notifications = notificationService.getNotifications();
+	public NotificationLinkListResource getNotificationsXML() {
+		ServletUriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentServletMapping();
+		List<Link> links = new ArrayList<Link>();
+		links.add(new Link(builder.path("/").build().toString(), "api"));
+		links.add(new Link(builder.path("/notify/").build().toString(), "self"));
+
 		NotificationLinkListResource notificationLinksResource = new NotificationLinkListResource();
-		List<Link> _links = new ArrayList<Link>();
-		_links.add(new Link(ServletUriComponentsBuilder
-		 .fromCurrentServletMapping().path("/")
-		 .build().toString(), "api"));
-		_links.add(new Link(ServletUriComponentsBuilder
-		 .fromCurrentServletMapping().path("/notify/")
-		 .build().toString(), "self"));
-		notificationLinksResource.setLinks(_links);
-		notificationLinksResource.setNotifications(notifications);
+		notificationLinksResource.setLinks(links);
+		notificationLinksResource.setNotifications(notificationService.getNotifications());
 		return notificationLinksResource;
 	}
 	
-	@RequestMapping(value = "/api/v1/notify", 
-			method = RequestMethod.POST)
-	@ResponseBody
-	@ResponseStatus(HttpStatus.ACCEPTED)
-	public ResponseEntity<?> notify(String subject, String message, String toAddress, String ccAddress){
-		notificationService.notify(subject, message, Arrays.asList(toAddress), Arrays.asList(ccAddress));
-		return new ResponseEntity<>(HttpStatus.ACCEPTED);
+	@RequestMapping(value = "notify", method = RequestMethod.POST)
+	public ResponseEntity<?> notify(@RequestBody NotificationForm form) {
+		try {
+			List<String> toAddress = Arrays.asList(form.getToAddress().split(";"));
+			List<String> ccAddress = new ArrayList<String>();
+			if(form.getCcAddress() != null)
+				ccAddress = Arrays.asList(form.getCcAddress().split(";"));
+			notificationService.notify(form.getSubject(), form.getMessage(), toAddress, ccAddress);
+			return new ResponseEntity<>(null, null, HttpStatus.ACCEPTED);
+		} catch (Exception ex) {
+			logger.error(ex.getMessage());
+			return new ResponseEntity<>(null, null, HttpStatus.INTERNAL_SERVER_ERROR);			
+		}
 	}
-}
+	}
