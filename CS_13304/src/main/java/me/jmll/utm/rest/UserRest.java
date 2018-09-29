@@ -45,7 +45,12 @@ public class UserRest {
 	@ResponseStatus(HttpStatus.OK)
 	public Map<String, Object> getUsersJSON() {
 		// Escribe tu código aquí {
-		
+		ServletUriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentServletMapping();
+		List<Link> links = new ArrayList<Link>();
+		links.add(new Link(builder.path("/").build().toString(), "self"));
+		links.add(new Link(builder.path("/user").build().toString(), "user"));
+		Map<String, Object> response = new Hashtable<>(1);
+		response.put("_links", links);
 		// }
 		return response;
 	}
@@ -62,7 +67,10 @@ public class UserRest {
 	@ResponseStatus(HttpStatus.OK)
 	public UserLinkListResource getUsersXML() {
 		// Escribe tu código aquí {
-		
+		ServletUriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentServletMapping();
+		UserLinkListResource userLinksResource = new UserLinkListResource();
+		userLinksResource.addUserLink(new Link(builder.path("/").build().toString(), "self"));
+		userLinksResource.addUserLink(new Link(builder.path("/user").build().toString(), "user"));
 		// }
 		return userLinksResource;
 	}
@@ -78,7 +86,11 @@ public class UserRest {
 	@ResponseStatus(HttpStatus.OK)
 	public Map<String, Object> getUserJSON(@PathVariable("username") String username) {
 		// Escribe tu código aquí {
-
+		User user = this.userService.getUser(username);
+		if(user == null)
+			throw new ResourceNotFoundException();
+		Map<String, Object> response = new Hashtable<>(1);
+		response.put("data", user);
 		// }
 		return response;
 	}
@@ -94,7 +106,11 @@ public class UserRest {
 	@ResponseStatus(HttpStatus.OK)
 	public UserResource getUserXML(@PathVariable("username") String username) {
 		// Escribe tu código aquí {
-		
+		User user = this.userService.getUser(username);
+		if(user == null)
+			throw new ResourceNotFoundException();
+		UserResource resource = new UserResource();
+		resource.setUser(user);
 		// }
 		return resource;
 	}
