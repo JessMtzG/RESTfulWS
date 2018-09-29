@@ -76,5 +76,21 @@ public class FileServiceImpl implements FileService {
         }
 		return false;
 	}
+	@Override
+	public String delete(String path) {
+    	Path filePath = Paths.get(path);
+    	try {
+        	if (Files.notExists(filePath)) {
+        		logger.warn("Target path does not exist. Creating {}", path);
+        	} else {
+        		Files.delete(filePath);
+                logger.info("Successfully deleted {} ", filePath.toString());
+        	}
+        }
+        catch (Exception ex) {
+        	logger.error("{}: {}", ex.getClass(), ex.getMessage());
+        }
+		return filePath.getFileName().toString();
+	}
 
 }
