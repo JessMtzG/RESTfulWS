@@ -28,6 +28,6 @@ public class CustomExceptionHandler {
 	 * MethodNotAllowedException
 	 */
 	// Escribe tu código aquí {
-
+	
 	// }
 }
