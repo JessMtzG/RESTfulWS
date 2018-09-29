@@ -6,7 +6,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import me.jmll.utm.model.Link;
 import me.jmll.utm.model.Resource;
@@ -52,6 +54,15 @@ public class IndexRest {
 		resource.addLink(new Link(builder.path("/").build().toString(), "self"));
 		resource.addLink(new Link(builder.path("/user").build().toString(), "user"));
 		return resource;
+	}
+	
+	@RequestMapping(value = {"", "/"},
+			method = RequestMethod.OPTIONS)
+	@ResponseBody
+	public ResponseEntity<?> showOptions(){
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Allow", "OPTIONS,GET");
+		return new ResponseEntity<>(headers, HttpStatus.ACCEPTED);
 	}
 
 }
