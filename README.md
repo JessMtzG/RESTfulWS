@@ -15,7 +15,7 @@ c) Créditos
 
 - Jose Manuel Lopez Lujan, MIT.
 - Universidad TecMilenio.
-- Profr. Zuriel Dathan Mora Felix.
+- Profr. Daniel Horacio Chávez Argott
 
 d) Licencia
 
